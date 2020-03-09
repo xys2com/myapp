@@ -1,0 +1,223 @@
+@charset "utf-8";
+
+* {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+body,
+html {
+    padding: 0;
+    margin: 0;
+    font: 14px/1.5 "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", "Hiragino Sans GB", "Heiti SC", "WenQuanYi Micro Hei", sans-serif;
+}
+
+ul,
+li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+body {
+    background: linear-gradient(to bottom, #040426, #173185)
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#canvas-moon {
+    background: linear-gradient(to bottom, #0e1b58, #040426)
+}
+
+.musicbox {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    z-index: 1000;
+}
+
+.musiclist {
+    position: relative;
+    height: 60%;
+    width: 200px;
+    box-shadow: 0px 3px 3px rgba(255, 239, 180, .125),
+        0px -3px 3px rgba(255, 239, 180, .125),
+        3px 0px 3px rgba(255, 239, 180, .125),
+        -3px 0px 3px rgba(255, 239, 180, .125);
+    border-radius: 5px;
+    background: rgba(0, 0, 0, .4);
+    opacity: .2;
+    transition: opacity .2s;
+}
+.musiclist:hover{
+    opacity: 1;
+}
+.musiclist ul {
+    position: relative;
+    height: 60%;
+    width: 100%;
+    padding: 5px 10px;
+    overflow-y: scroll;
+    box-shadow: 0 2px 2px rgba(255, 255, 255, .4);
+}
+.musiclist ul::-webkit-scrollbar  {/**/   
+    border-radius: 5px;
+    overflow: hidden;
+    width:6px;
+}
+.musiclist ul::-webkit-scrollbar-thumb {
+    border-radius: 1px;
+    background: rgba(255,255,255,.2); 
+}
+.musiclist ul::-webkit-scrollbar-track {
+    border-radius: 1px;
+}
+.musiclist li {
+    height: 30px;
+    line-height: 28px;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #fff;
+    border-bottom: .5px solid rgba(255, 255, 255, .4);
+    cursor: pointer;
+    padding-left: 20px;
+}
+.musiclist li:hover{
+    text-shadow: 0px 3px 3px rgba(255, 255, 255, .4),
+    0px -3px 3px rgba(255, 255, 255, .4),
+    3px 0px 3px rgba(255, 255, 255, .4),
+    -3px 0px 3px rgba(255, 255, 255, .4);
+}
+.musiclist li:first-child {
+    border-top: .5px solid rgba(255, 255, 255, .4);
+}  
+
+.musiclist li.play { 
+    color: #fff;
+    text-shadow: 0px 4px 5px rgb(44, 128, 253),
+    0px -4px 5px rgb(44, 128, 253),
+    5px 0px 6px rgb(44, 128, 253),
+    -5px 0px 6px rgb(44, 128, 253);
+    box-shadow: 0px 0px 2px rgb(90, 153, 248),
+    0px -0px 2px rgb(90, 153, 248),
+    0px 0px 2px rgb(90, 153, 248),
+    -0px 0px 2px rgb(90, 153, 248);
+}
+.control{
+    position: absolute;
+    min-height: 100px;
+    border-radius: 5px;
+    width: 90%;
+    left: 5%;
+    bottom: 10px;
+    background: rgba(255,255,255,.3);
+    box-shadow: 0px 3px 3px rgba(255, 255, 255, .2),
+    0px -3px 3px rgba(255, 255, 255, .2),
+    3px 0px 3px rgba(255, 255, 255, .2),
+    -3px 0px 3px rgba(255, 255, 255, .2);
+}
+.volume{
+    position: relative;
+    height: 30px;
+    width: 160;
+    margin:5px auto;
+    padding: 13px 0;
+}
+.volume .vol-block{
+    position: relative;
+    height: 4px;
+    width: 100%;
+    background: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+    box-shadow: 0px 3px 3px rgba(255, 255, 255, .2),
+    0px -3px 3px rgba(255, 255, 255, .2),
+    3px 0px 3px rgba(255, 255, 255, .2),
+    -3px 0px 3px rgba(255, 255, 255, .2);
+}
+.volume .vol-val{
+    position: relative;
+    height: 4px;
+    width: 50%;
+    background: #0099FF;
+    border-radius: 3px;
+    box-shadow: 0px 3px 3px rgba(0, 153, 255, .5),
+    0px -3px 3px rgba(0, 153, 255, .5),
+    3px 0px 3px rgba(0, 153, 255, .5),
+    -3px 0px 3px rgba(0, 153, 255, .5);
+}
+.volume .slide-block{
+    position: absolute;
+    height: 15px;
+    width: 15px;
+    border-radius: 7.5px;
+    left: calc(50% - 7.5px);
+    top:-5.5px;
+    background: #0099FF;
+    cursor: pointer;
+    box-shadow: 0px 3px 3px rgba(255, 255, 255, .2),
+    0px -3px 3px rgba(255, 255, 255, .2),
+    3px 0px 3px rgba(255, 255, 255, .2),
+    -3px 0px 3px rgba(255, 255, 255, .2);
+}
+.volume .slide-block .tips{
+    height: 20px;
+    width: 25px;
+    border:.5px solid #888;
+    background: rgba(255,255,255,.4);
+    position: absolute;
+    top:-25px;
+    left: -5px;
+    border-radius: 3px;
+    text-align: center;
+    font-size: 12px;
+    line-height:20px;
+    color:#ddd;
+    display: none;
+}
+.volume .slide-block .tips::after{
+    content:"";
+    display: block;
+    width: 0;
+    height: 0;
+    border-width: 5px 5px 0;
+    border-style:solid;
+    border-color: rgba(255,255,255,.4) transparent transparent;
+    left:7.5px;
+    bottom: -5px;
+    position:absolute;
+}
+.buttons {
+    position: relative;
+    height: 60px;
+    width: 160;
+    margin: 5px auto;
+    padding: 10px 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+.buttons .btn{
+    position: relative;
+    height: 40px;
+    width: 40px;
+    cursor: pointer;
+    overflow: visible;
+}
+.buttons .btn img{
+    position: absolute;
+    height: 150%;
+    width: 150%;
+    left: -10px;
+    top:-10px;
+}

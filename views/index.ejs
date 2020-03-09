@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+
+<body>
+    <header>
+        <h1><%= title %></h1>
+        <p>
+            音量: <input type="range" id="volume" min="0" max="100" value="50">
+        </p>
+        <p>
+            <span id="histogram">柱形图</span>
+            <span id="dot">圆点图</span>
+        </p>
+    </header>
+    <div class="left">
+        <ul id="list">
+            <% musics.forEach(function(name) { %>
+                <li title="<%= name %>"> <%= name %> </li>
+            <% }); %>
+        </ul>
+    </div>
+    <div class="right" id="cvsarea">
+        <canvas id="cvs2"></canvas>
+        <canvas id="cvs" hidden></canvas>
+    </div>
+</body>
+<script type='text/javascript' src="/javascripts/base.js"></script>
+<script>
+
+    $("#histogram").onclick=function(){
+        $("#cvs2").style.display="block"
+        $("#cvs").style.display="none"
+    }
+
+    $("#dot").onclick=function(){
+        $("#cvs").style.display="block"
+        $("#cvs2").style.display="none"
+    }
+
+
+    var AC = new window.AudioContext()||new window.webkitAudioContext()||new AudioContext();
+    var gainNode=AC[AC.createGain?"createGain":"creatGainNode"]();
+        gainNode.connect(AC.destination);
+
+    var source = null;
+    var count=0;//播放计数
+    var analyser=AC.createAnalyser();//音频
+    var size=256
+    analyser.fftSize=size*2;
+    analyser.connect(gainNode)
+
+    var cvsz=$("#cvs2")
+    var ctxz=cvsz.getContext("2d")
+
+    window.onload=function(){
+        //加载音乐名称
+        var list = $("#list li");
+        for(var i= 0;i<list.length;i++){
+            list[i].onclick=function(){
+                for(var j=0;j<list.length;j++){
+                    list[j].className=""
+                }
+                this.className="selected"
+                //播放单曲
+                ajaxReq("/media/"+this.title,{
+                    method:"GET",
+                    type:"arraybuffer"
+                },function(arraybuffer){
+                    var n=++count;
+                    source&&source[source.stop?"stop":"noteOff"]();
+                    getAudio(arraybuffer,n)
+                })
+                
+            }
+        }
+        //获得音频信息
+        visualizer()
+
+        cvsResize("#cvsarea","#cvs");
+        cvsResize("#cvsarea","#cvs2")
+        gainNode.gain.value = $("#volume").value / 100
+        $("#volume").onchange=function(){
+          gainNode.gain.value = this.value / 100
+        }
+    }
+    window.onresize=()=>{cvsResize("#cvsarea","#cvs");cvsResize("#cvsarea","#cvs2")};
+    function cvsResize(dom,cvs){
+        $(cvs).width=$(dom).clientWidth
+        $(cvs).height=$(dom).clientHeight
+        var lineGradient=ctxz.createLinearGradient(0,0,0,$(dom).clientHeight);
+        lineGradient.addColorStop(0,"rgba(255,0,0,.8)")
+        lineGradient.addColorStop(.5,"rgba(255,255,0,.5)")
+        lineGradient.addColorStop(1,"rgba(0,255,255,.3)")
+        ctxz.fillStyle=lineGradient
+    }
+    function draw(arr){
+        ctxz.clearRect(0,0,$("#cvs2").width,$("#cvs2").height)
+        var w=$("#cvs2").width/size;
+        for(let i=0;i<size;i++){
+            let h=(arr[i]/size * $("#cvs2").height)<=5?5:(arr[i]/size * $("#cvs2").height);
+            ctxz.fillRect(w*i,$("#cvs2").height-h,w*.6,h)
+        }
+    }
+    //解析数据流 并播放
+    function getAudio(arraybuffer,n){
+        if(n!=count) return;
+        AC.decodeAudioData(arraybuffer,function(buffer){
+            if(n!=count) return;
+            var bufferSource = AC.createBufferSource();
+            bufferSource.buffer = buffer;
+            bufferSource.connect(analyser)
+            // 2.bufferSource.connect(gainNode)
+            // 1.bufferSource.connect(AC.destination)
+            bufferSource[bufferSource.start?"start":"noteOn"](0)
+            source=bufferSource;
+        },function(err){
+            console.log(err)
+        })
+    }
+    //分析音频数据
+
+    function visualizer(){
+        var arr= new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(arr)
+        requestAnimationFrame = window.requestAnimationFrame||
+                                window.webkitRequestAnimationFrame||
+                                window.mozRequestAnimationFrame;
+        function vn(){
+            analyser.getByteFrequencyData(arr)
+            draw(arr)
+            main(arr);
+            requestAnimationFrame(vn);
+        }
+        requestAnimationFrame(vn)
+    }
+    
+</script>
+<script type='text/javascript' src="/javascripts/dot.js"></script>
+</html>
