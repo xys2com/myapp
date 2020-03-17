@@ -41,4 +41,8 @@ router.post('/addbook', (req, res) => {
   //   }
   // })
 })
+router.post('/addsetting', (req, res) => {
+  console.log(req.body)
+  res.json(req.body)
+})
 module.exports = router;
